@@ -2,6 +2,7 @@ package dev.hongsii.filter
 
 import org.reactivestreams.Subscription
 import org.slf4j.MDC
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
@@ -21,14 +22,17 @@ class MdcLoggingFilter : WebFilter {
 
     companion object {
         private val MDC_CONTEXT_REACTOR_KEY: String = MdcLoggingFilter::class.java.name
-
         const val REQUEST_ID = "txid"
+        const val HEADER_KEY = "req_txid"
     }
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+        val headers: HttpHeaders = exchange.request.headers
         return chain
-                .filter(exchange)
-                .subscriberContext { it.put(REQUEST_ID, UUID.randomUUID().toString().replace("-", "")) }
+            .filter(exchange)
+            .subscriberContext {
+                it.put(REQUEST_ID, headers[HEADER_KEY] ?: UUID.randomUUID().toString().replace("-", ""))
+            }
     }
 
     @PostConstruct

@@ -14,11 +14,21 @@ class AccountHandler(
 ) {
 
     fun getAccounts(request: ServerRequest) =
-            Mono.just(customizedAccountRepository.findAllByQueryDsl())
-                    .flatMap { ServerResponse.ok().bodyValue(it) }
-                    .doOnNext { log.info("next log") }
-                    .publishOn(Schedulers.elastic())
-                    .doOnSuccess { log.info("success log") }
+        Mono.just(listOf("a", "b"))
+            .flatMap {
+                log.info("list -> $it")
+                ServerResponse.ok().bodyValue(it)
+            }
+            .doOnNext { log.info("next log") }
+            .publishOn(Schedulers.elastic())
+            .doOnSuccess { log.info("success log") }
+
+//    fun getAccounts(request: ServerRequest) =
+//            Mono.just(customizedAccountRepository.findAllByQueryDsl())
+//                    .flatMap { ServerResponse.ok().bodyValue(it) }
+//                    .doOnNext { log.info("next log") }
+//                    .publishOn(Schedulers.elastic())
+//                    .doOnSuccess { log.info("success log") }
 
     fun getAccountsWithIO(request: ServerRequest) =
             Mono.fromCallable { customizedAccountRepository.findAllByQueryDsl() }
